@@ -8,8 +8,9 @@ using EduHub.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Thay AddSwaggerGen bằng AddOpenApi
 builder.Services.AddControllers();
+// THÊM DÒNG NÀY: Để hệ thống có thể tìm thấy các API Endpoint và đưa lên Scalar
+builder.Services.AddEndpointsApiExplorer(); 
 builder.Services.AddOpenApi();
 
 // Đăng ký Repository
@@ -20,14 +21,17 @@ builder.Services.AddTransient<EmailNotificationService>();
 builder.Services.AddTransient<SmsNotificationService>();
 
 // Đăng ký Factory và EventService
-builder.Services.AddTransient<INotificationFactory, NotificationFactory>();
+builder.Services.AddTransient<INotificationFactory, INotificationFactory>();
 builder.Services.AddTransient<EventService>();
 
 var app = builder.Build();
 
-// Thay UseSwagger bằng MapOpenApi và MapScalarApiReference
-app.MapOpenApi();
-app.MapScalarApiReference();
+// THÊM KHỐI IF NÀY: Chỉ hiển thị tài liệu API khi đang code (Development)
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 app.MapControllers();
 
